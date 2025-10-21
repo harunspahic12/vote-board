@@ -5,6 +5,8 @@ import IdeaForm from './components/IdeaForm'
 import SearchBar from './components/SearchBar'
 import { Idea } from './types'
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 function App() {
   const [ideas, setIdeas] = useState<Idea[]>([])
   const [loading, setLoading] = useState(true)
@@ -16,8 +18,8 @@ function App() {
       setLoading(true)
       setError(null)
       const url = search 
-        ? `/api/ideas?search=${encodeURIComponent(search)}`
-        : '/api/ideas'
+        ? `${API_URL}/api/ideas?search=${encodeURIComponent(search)}`
+        : `${API_URL}/api/ideas`
       const response = await fetch(url)
       
       if (!response.ok) {
@@ -39,7 +41,7 @@ function App() {
 
   const handleCreateIdea = async (title: string, description: string) => {
     try {
-      const response = await fetch('/api/ideas', {
+      const response = await fetch(`${API_URL}/api/ideas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ function App() {
 
   const handleVote = async (ideaId: number) => {
     try {
-      const response = await fetch(`/api/ideas/${ideaId}/vote`, {
+      const response = await fetch(`${API_URL}/api/ideas/${ideaId}/vote`, {
         method: 'POST',
       })
 
@@ -87,7 +89,7 @@ function App() {
 
   const handleDelete = async (ideaId: number) => {
     try {
-      const response = await fetch(`/api/ideas/${ideaId}`, {
+      const response = await fetch(`${API_URL}/api/ideas/${ideaId}`, {
         method: 'DELETE',
       })
 
