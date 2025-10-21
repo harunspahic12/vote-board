@@ -1,0 +1,10 @@
+{
+  "name": "vote-board-backend",
+  "version": "1.0.0",
+  "description": "Vote Board Backend API",
+  "scripts": {
+    "dev": "python main.py",
+    "start": "python main.py"
+  }
+}
+
