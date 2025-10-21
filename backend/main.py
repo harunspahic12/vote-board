@@ -48,6 +48,40 @@ def get_db_connection():
     finally:
         conn.close()
 
+def initialize_database():
+    """Initialize database schema and sample data on startup"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                # Create table if it doesn't exist
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS ideas (
+                        id SERIAL PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        description TEXT,
+                        votes INTEGER DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                """)
+                
+                # Check if table is empty, if so add sample data
+                cur.execute("SELECT COUNT(*) FROM ideas")
+                count = cur.fetchone()['count']
+                
+                if count == 0:
+                    cur.execute("""
+                        INSERT INTO ideas (title, description, votes) VALUES
+                            ('Add dark mode', 'Would be great to have a dark theme option', 15),
+                            ('Mobile app version', 'Create native mobile apps for iOS and Android', 23),
+                            ('Export to PDF', 'Allow exporting ideas list as PDF', 8);
+                    """)
+                    print("✅ Database initialized with sample data")
+                else:
+                    print("✅ Database already initialized")
+    except Exception as e:
+        print(f"⚠️ Error initializing database: {e}")
+        # Don't crash the app if DB init fails, just log the error
+
 # Pydantic models
 class IdeaCreate(BaseModel):
     title: str
@@ -160,6 +194,12 @@ def delete_idea(idea_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@app.on_event("startup")
+async def startup_event():
+    """Run database initialization on startup"""
+    print("🚀 Starting Vote Board API...")
+    initialize_database()
 
 if __name__ == "__main__":
     import uvicorn
