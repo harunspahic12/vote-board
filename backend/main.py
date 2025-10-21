@@ -13,20 +13,11 @@ load_dotenv()
 app = FastAPI()
 
 # CORS configuration
-# Allow frontend from localhost and production (Vercel)
-allowed_origins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-]
-
-# Add production frontend URL from environment if available
-frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url:
-    allowed_origins.append(frontend_url)
-
+# Allow all origins in production for simplicity
+# In production, we allow any Vercel deployment URL
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins if not os.getenv("RAILWAY_ENVIRONMENT") else ["*"],
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
